@@ -7,12 +7,9 @@ import javax.swing.ImageIcon;
 import spriteframework.sprite.BadSprite;
 import spriteframework.sprite.BadnessBoxSprite;
 
-/// é o alien
 public class BomberSprite extends BadnessBoxSprite {
 
     private Bomb bomb;
-    // cada alien tem SUA bomba que quando é destruída pode ser reutilizada,
-    // por isso lança uma única por vez
 
     public BomberSprite(int x, int y) {
 
@@ -35,6 +32,7 @@ public class BomberSprite extends BadnessBoxSprite {
 
 
     public Bomb getBomb() {
+
         return bomb;
     }
 

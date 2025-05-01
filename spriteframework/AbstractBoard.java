@@ -54,6 +54,7 @@ public abstract class AbstractBoard extends JPanel {
     protected abstract void drawOtherSprites(Graphics g);
     protected abstract void update();
     protected abstract void processOtherSprites(Player player, KeyEvent e);
+    protected abstract void setPlayerMovementStrategy(Player player);
 
     public AbstractBoard() {
 
@@ -63,6 +64,7 @@ public abstract class AbstractBoard extends JPanel {
 		        badSprites = new LinkedList<BadSprite>();
 		        createBadSprites();
 		        createOtherSprites();
+
 		//        shot = new Shot();
     }
 
@@ -70,6 +72,7 @@ public abstract class AbstractBoard extends JPanel {
 
     	addKeyListener(new TAdapter());
     	setFocusable(true);
+
     	d = new Dimension(Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
     	setBackground(Color.black);
 
@@ -81,6 +84,8 @@ public abstract class AbstractBoard extends JPanel {
     	badSprites = new LinkedList<BadSprite>();
     	createBadSprites();
     	createOtherSprites();
+
+
 		//        shot = new Shot();
     }
 
@@ -88,6 +93,9 @@ public abstract class AbstractBoard extends JPanel {
     protected void createPlayers() {
 		players = new LinkedList<Player>();
         players.add(createPlayer());
+        for(Player player: players){
+            setPlayerMovementStrategy(player);
+        }
 	}
 	
 	protected Player createPlayer() {
@@ -136,10 +144,6 @@ public abstract class AbstractBoard extends JPanel {
     		}
     	}
     }
-
-
-
-
 
     @Override
     public void paintComponent(Graphics g) {
@@ -199,13 +203,11 @@ public abstract class AbstractBoard extends JPanel {
     }
 
 
-
     private void doGameCycle() {
 
         update();
         repaint();
     }
-
 
 
 	private class GameCycle implements ActionListener {

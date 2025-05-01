@@ -11,6 +11,8 @@ import javax.swing.ImageIcon;
 
 import spriteframework.AbstractBoard;
 import spriteframework.sprite.BadSprite;
+import spriteframework.sprite.FourMoviment;
+import spriteframework.sprite.HorizontalMoviment;
 import spriteframework.sprite.Player;
 
 import spaceinvaders.sprite.*;
@@ -27,8 +29,9 @@ public class SpaceInvadersBoard extends AbstractBoard{
 
     private String explImg = "images/explosion.png";
 
-
-
+    protected void setPlayerMovementStrategy(Player p) {
+        p.setMovStrategy(new HorizontalMoviment());
+    }
 
     protected void createBadSprites() {  // create sprites
         for (int i = 0; i < 4; i++) {
@@ -39,8 +42,6 @@ public class SpaceInvadersBoard extends AbstractBoard{
             }
         }
     }
-
-
     
     protected void createOtherSprites() {
         shot = new Shot();
@@ -49,6 +50,7 @@ public class SpaceInvadersBoard extends AbstractBoard{
     private void drawShot(Graphics g) {
 
         if (shot.isVisible()) {
+
             g.drawImage(shot.getImage(), shot.getX(), shot.getY(), this);
         }
     }
@@ -68,7 +70,7 @@ public class SpaceInvadersBoard extends AbstractBoard{
 
 			if (inGame) {
 
-				if (!shot.isVisible()) { /// se o tiro já tiver saído da tela pode dar outro
+				if (!shot.isVisible()) {
 
 					shot = new Shot(x, y);
 				}
@@ -109,11 +111,6 @@ public class SpaceInvadersBoard extends AbstractBoard{
         	player.act();
 
         // shot
-        /**
-         * Como so tem um tiro por ver só é necessário verificar sua colisão
-         * se fosse uma lista de tiros seria necessárioum fors aninhados
-         * ia ser mt mais cuustoso pra cada ciclo de update
-         * */
         if (shot.isVisible()) {
 
             int shotX = shot.getX();
@@ -138,10 +135,7 @@ public class SpaceInvadersBoard extends AbstractBoard{
                     }
                 }
             }
-            /** TIRO
-             * Para o tiro do woody precisamos atualizar aqui a movimentação dele
-             * mas nãos eria melhor colocar isso na classe de tiro ???
-             * */
+
             int y = shot.getY();
             y -= 4;
 
@@ -153,12 +147,7 @@ public class SpaceInvadersBoard extends AbstractBoard{
         }
 
         // aliens
-        /**
-         * O mesmo para isso aqui
-         * A movimentção dos aliens deve ser mudada aqui pra ficar como
-         * o PPP quer.
-         * Mas não deveria estar na classe alien ?
-         * */
+
         for (BadSprite alien : badSprites) {
 
             int x = alien.getX();
@@ -221,8 +210,8 @@ public class SpaceInvadersBoard extends AbstractBoard{
 
         for (BadSprite alien : badSprites) {
 
-            int shot = generator.nextInt(100); // estava 15, literalmente certeza que todas iam atirar ao memso tempo, agora ta esparçado
-            Bomb bomb = ((BomberSprite)alien).getBomb(); // pega a bomba de cada alien
+            int shot = generator.nextInt(15);
+            Bomb bomb = ((BomberSprite)alien).getBomb();
 
             if (shot == Commons.CHANCE && alien.isVisible() && bomb.isDestroyed()) {
 

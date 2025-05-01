@@ -11,11 +11,14 @@ public class Player extends Sprite {
 
     private int width;
     private int height;
+    private String direction;
+    private MovStrategy movStrategy;
 
     public Player() {
         loadImage();
 		getImageDimensions();
 		resetState();
+        movStrategy = new HorizontalMoviment();
     }
 
     protected void loadImage () {
@@ -39,16 +42,9 @@ public class Player extends Sprite {
             x = Commons.BOARD_WIDTH - 2 * width;
         }
 
-        /**
-         * Não entendi porque o borad é criado com Commons.BOARD_HEIGHT ( = 350)
-         * mas na hora de testar a posição da nave 350 dá fora da tela, muito mais abaixo
-         *  ?????
-         *  verificar isso
-         * */
         if (y >= Commons.BOARD_HEIGHT - 3 * height) {
             y = Commons.BOARD_HEIGHT - 3 * height;
         }
-
 
     }
 
@@ -56,25 +52,27 @@ public class Player extends Sprite {
 
         int key = e.getKeyCode();
 
-        if (key == KeyEvent.VK_LEFT) {
+        movStrategy.updatePosition(this, e);
 
+        /*if (key == KeyEvent.VK_LEFT) {
+            direction = "left";
             dx = -2;
         }
 
         if (key == KeyEvent.VK_RIGHT) {
-
+            direction = "right";
             dx = 2;
         }
 
         if (key == KeyEvent.VK_UP) {
-
+            direction = "up";
             dy = -2;
         }
 
         if (key == KeyEvent.VK_DOWN) {
-
+            direction = "down";
             dy = 2;
-        }
+        }*/
     }
 
     public void keyReleased(KeyEvent e) {
@@ -97,6 +95,17 @@ public class Player extends Sprite {
             dy = 0;
         }
     }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String dir) { this.direction = dir;}
+
+    public void setMovStrategy(MovStrategy movStrategy) {
+        this.movStrategy = movStrategy;
+    }
+
     private void resetState() {
 
         setX(Commons.INIT_PLAYER_X);
