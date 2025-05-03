@@ -110,6 +110,12 @@ public class SpaceInvadersBoard extends AbstractBoard{
         for (Player player: players) 
         	player.act();
 
+        /**
+         * Será que não valeria a pena mover o shot para o framwork ?
+         * Já que os dois estão repetindo a mesma coisa praticamente nos dois jogos
+         * se a ideia do framework é diminuir código dos jogos tem q mover
+         * */
+
         // shot
         if (shot.isVisible()) {
 

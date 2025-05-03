@@ -1,6 +1,5 @@
 package spriteframework;
 
-
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -20,7 +19,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
-
 
 public abstract class AbstractBoard extends JPanel {
 

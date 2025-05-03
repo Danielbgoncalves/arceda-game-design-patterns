@@ -56,7 +56,7 @@ public class Shot extends BadSprite {
         setY(y);
         setX(x);
 
-        System.out.println("Tiro atualizado");
+        // System.out.println("Tiro atualizado");
 
         if (y < 0 || y > 350 || x < 0 || x > 358) {
             die();
