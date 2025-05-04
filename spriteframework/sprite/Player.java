@@ -7,24 +7,30 @@ import spriteframework.Commons;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 
+
 public class Player extends Sprite {
 
     private int width;
     private int height;
     private String direction;
     private MovStrategy movStrategy;
+    private Commons config;
 
-    public Player() {
-        loadImage();
+    public Player(String localizacao, int larg, int alt, Commons config){
+        loadImage(localizacao, larg, alt);
 		getImageDimensions();
-		resetState();
+        this.config = config;
+        resetState();
         movStrategy = new HorizontalMoviment();
+        //if(config == null) System.out.println("config null");
     }
 
-    protected void loadImage () {
-        ImageIcon ii = new ImageIcon(this.getClass().getResource("/images/player.png"));
+    protected void loadImage (String localizacao, int larg, int alt) {
+
+        ScaleImage scaledImage = new ScaleImage(localizacao,  larg, alt);
+        ImageIcon ii = scaledImage.getScaledImage();
         width = ii.getImage().getWidth(null);
-        height = ii.getImage().getWidth(null);
+        height = ii.getImage().getHeight(null);
         setImage(ii.getImage());
     }
     
@@ -38,12 +44,12 @@ public class Player extends Sprite {
         if (y <= 2) y = 2;
 
 
-        if (x >= Commons.BOARD_WIDTH - 2 * width) {
-            x = Commons.BOARD_WIDTH - 2 * width;
+        if (x >= config.getBoardWidth()- config.getBorderRight() - (width/2)) {
+            x = config.getPlayerWidth() - config.getBorderRight() - (width/2);
         }
 
-        if (y >= Commons.BOARD_HEIGHT - 3 * height) {
-            y = Commons.BOARD_HEIGHT - 3 * height;
+        if (y >= config.getBoardHeight() - config.getBorderBotton() - height) {
+            y = config.getBoardHeight() - config.getBorderBotton() - height;
         }
 
     }
@@ -54,25 +60,7 @@ public class Player extends Sprite {
 
         movStrategy.updatePosition(this, e);
 
-        /*if (key == KeyEvent.VK_LEFT) {
-            direction = "left";
-            dx = -2;
-        }
 
-        if (key == KeyEvent.VK_RIGHT) {
-            direction = "right";
-            dx = 2;
-        }
-
-        if (key == KeyEvent.VK_UP) {
-            direction = "up";
-            dy = -2;
-        }
-
-        if (key == KeyEvent.VK_DOWN) {
-            direction = "down";
-            dy = 2;
-        }*/
     }
 
     public void keyReleased(KeyEvent e) {
@@ -106,9 +94,11 @@ public class Player extends Sprite {
         this.movStrategy = movStrategy;
     }
 
+    public void setConfig(Commons config){this.config = config;}
+
     private void resetState() {
 
-        setX(Commons.INIT_PLAYER_X);
-        setY(Commons.INIT_PLAYER_Y);
+        setX(config.getInitPlayerX() );
+        setY(config.getInitPlayerY());
     }
 }

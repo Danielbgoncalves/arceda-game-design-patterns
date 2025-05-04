@@ -1,20 +1,19 @@
 package freezeMonster;
 
-
-import java.awt.Graphics;
+import java.awt.*;
 
 import java.awt.event.KeyEvent;
-import java.util.Iterator;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import spriteframework.AbstractBoard;
 import spriteframework.sprite.BadSprite;
 import spriteframework.sprite.FourMoviment;
 import spriteframework.sprite.Player;
-
 import freezeMonster.sprite.*;
+import spriteframework.Commons;
+import spriteframework.sprite.ScaleImage;
 
 public class FreezeMonsterBoard extends AbstractBoard{
     //define sprites
@@ -24,22 +23,52 @@ public class FreezeMonsterBoard extends AbstractBoard{
     // define global control vars   
     private int direction = -1;
     private int deaths = 0;
-
+    private Commons configCommons;
 
     private String explImg = "images/explosion.png";
+    private String woodyBeaten = "/images/woodypreso.png";
+
+    FreezeMonsterBoard(Commons config){
+        super(config);
+        this.configCommons = config;
+    }
 
     protected void setPlayerMovementStrategy(Player player) {
         player.setMovStrategy(new FourMoviment());
     }
 
-    protected void createBadSprites() {  // create sprites
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 6; j++) {
-                MonsterSprite monster = new MonsterSprite(Commons.MONSTER_INIT_X + 18 * j,
-                        Commons.MONSTER_INIT_Y + 18 * i);
-                badSprites.add(monster);
-            }
+    protected void createBadSprites(Commons config) {  // create sprites
+
+        int maxX = config.getBoardWidth();
+        int maxY = config.getBoardHeight()-150;
+
+        int monster_y_initial, monster_x_initial, num = 1;
+        String primaryPath, froozenPath;
+
+        Random rand = new Random();
+        for(int i = 0; i < config.getNumber_bad_sprites_to_destoy() ; i++){
+            do{
+                monster_x_initial = rand.nextInt((maxX) + 1);
+                monster_y_initial = rand.nextInt((maxY) + 1);
+            } while(monster_x_initial > config.getInitPlayerX() - 30 &&
+                monster_x_initial < config.getInitPlayerX() + 30 ||
+                monster_y_initial > config.getInitPlayerY() - 30 &&
+                monster_y_initial < config.getInitPlayerY() + 30
+            );
+
+            num = (num + i) % 10;
+            primaryPath = "/images/monster" + num + ".png";
+            froozenPath = "/images/monster" + num + "bg.png";
+            MonsterSprite monster = new MonsterSprite(primaryPath,monster_x_initial,
+                    monster_y_initial, 40, 40);
+            monster.setFroozenPath(froozenPath);
+            badSprites.add(monster);
         }
+
+    }
+
+    protected Dimension setDimensions(){
+        return new Dimension(700,600);
     }
     
     protected void createOtherSprites() {
@@ -51,6 +80,11 @@ public class FreezeMonsterBoard extends AbstractBoard{
         if (shot.isVisible()) {
             g.drawImage(shot.getImage(), shot.getX(), shot.getY(), this);
         }
+    }
+
+    @Override
+    protected Player createPlayer(Commons config) { // falta fazer o mesmo no spaceinvaders
+        return new Player("/images/woody.png", 50,70, config);
     }
 
     // Override
@@ -69,9 +103,9 @@ public class FreezeMonsterBoard extends AbstractBoard{
 			if (inGame) {
 
                 System.out.println(shot.isVisible());
-				if (!shot.isVisible()) { /// se o tiro já tiver saído da tela pode dar outro
+				if (!shot.isVisible()) {
 
-					shot = new Shot(x, y);
+					shot = new Shot("/images/ray.png", x, y,25,25 );
                     shot.setDirection(player.getDirection());
 				}
 			}
@@ -80,7 +114,7 @@ public class FreezeMonsterBoard extends AbstractBoard{
 
     protected void update() {
 
-        if (deaths == Commons.NUMBER_OF_MONSTERS_TO_DESTROY) {
+        if (deaths == configCommons.getNumber_bad_sprites_to_destoy()) {
 
             inGame = false;
             timer.stop();
@@ -97,6 +131,8 @@ public class FreezeMonsterBoard extends AbstractBoard{
          * se fosse uma lista de tiros seria necessárioum fors aninhados
          * ia ser mt mais custoso pra cada ciclo de update
          **/
+
+        /// Tiro do woody com os monstros
         if (shot.isVisible()) { // colisão de tiro e monster
 
             shot.updatePosition(); // atualizar cada tiro também
@@ -111,9 +147,9 @@ public class FreezeMonsterBoard extends AbstractBoard{
 
                 if (monster.isVisible() && shot.isVisible()) {
                     if (shotX >= (monsterX)
-                            && shotX <= (monsterX + Commons.MONSTER_WIDTH)
+                            && shotX <= (monsterX + configCommons.getBad_sprite_width())
                             && shotY >= (monsterY)
-                            && shotY <= (monsterY + Commons.MONSTER_HEIGHT)) {
+                            && shotY <= (monsterY + configCommons.getBad_sprite_height())) {
 
                         ImageIcon ii = new ImageIcon(explImg);
                         monster.setImage(ii.getImage());
@@ -134,56 +170,10 @@ public class FreezeMonsterBoard extends AbstractBoard{
          * Mas não deveria estar na classe do monstro ?
          * */
         for (BadSprite monster : badSprites) {
-
-            int x = monster.getX();
-
-            if (x >= Commons.BOARD_WIDTH - Commons.BORDER_RIGHT && direction != -1) {
-
-                direction = -1;
-
-                Iterator<BadSprite> i1 = badSprites.iterator();
-
-                while (i1.hasNext()) {
-                    BadSprite a2 = i1.next();
-                    a2.setY(a2.getY() + Commons.GO_DOWN);
-                }
-            }
-
-            if (x <= Commons.BORDER_LEFT && direction != 1) {
-
-                direction = 1;
-
-                Iterator<BadSprite> i2 = badSprites.iterator();
-
-                while (i2.hasNext()) {
-
-                    BadSprite a = i2.next();
-                    a.setY(a.getY() + Commons.GO_DOWN);
-                }
-            }
+            monster.initMovimentation();
         }
 
-        Iterator<BadSprite> it = badSprites.iterator();
-
-        while (it.hasNext()) {
-
-            BadSprite monster = it.next();
-
-            if (monster.isVisible()) {
-
-                int y = monster.getY();
-
-                if (y > Commons.GROUND - Commons.MONSTER_HEIGHT) {
-                    inGame = false;
-                    message = "Invasion!";
-                }
-
-                monster.moveX(direction);
-            }
-        }
-
-        // bombs
-        
+        // slimes
         updateOtherSprites();
     }
 
@@ -195,7 +185,7 @@ public class FreezeMonsterBoard extends AbstractBoard{
             int shot = generator.nextInt(100); // estava 15, literalmente certeza que todas iam atirar ao memso tempo, agora ta esparçado
             Slime slime = ((MonsterSprite)monster).getSlime(); // pega o slime de cada monstro
 
-            if (shot == Commons.CHANCE && monster.isVisible() && slime.isDestroyed()) {
+            if (shot == config.getChance() && monster.isVisible() && slime.isDestroyed()) {
 
                 slime.setDestroyed(false);
                 slime.setX(monster.getX());
@@ -210,13 +200,19 @@ public class FreezeMonsterBoard extends AbstractBoard{
             if (players.get(0).isVisible() && !slime.isDestroyed()) {
 
                 if (slimeX >= (playerX)
-                        && slimeX <= (playerX + Commons.PLAYER_WIDTH)
+                        && slimeX <= (playerX + configCommons.getPlayerWidth())
                         && slimeY >= (playerY)
-                        && slimeY <= (playerY + Commons.PLAYER_HEIGHT)) {
+                        && slimeY <= (playerY + configCommons.getPlayerWidth())){
 
-                    ImageIcon ii = new ImageIcon(explImg);
+                    ScaleImage scaledImage = new ScaleImage(woodyBeaten,  50, 70);
+                    ImageIcon ii = scaledImage.getScaledImage();
                     players.get(0).setImage(ii.getImage());
-                    players.get(0).setDying(true);
+
+                    new javax.swing.Timer(400, e -> {
+                        ((Timer)e.getSource()).stop();
+                        players.get(0).setDying(true);
+                    }).start();
+
                     slime.setDestroyed(true);
                 }
             }
@@ -225,7 +221,7 @@ public class FreezeMonsterBoard extends AbstractBoard{
 
                 slime.setY(slime.getY() + 1);
 
-                if (slime.getY() >= Commons.GROUND - Commons.SLIME_HEIGHT) {
+                if (slime.getY() >= configCommons.getGround() - configCommons.getAttackHeight()) {
 
                     slime.setDestroyed(true);
                 }

@@ -3,6 +3,7 @@ package freezeMonster.sprite;
 import javax.swing.ImageIcon;
 
 import spriteframework.sprite.BadSprite;
+import spriteframework.sprite.ScaleImage;
 
 import java.util.Objects;
 
@@ -13,15 +14,15 @@ public class Shot extends BadSprite {
     public Shot(){
     }
 
-    public Shot(int x, int y) {
+    public Shot(String loc, int x, int y, int larg, int alt) {
 
-        initShot(x, y);
+        initShot(loc, x, y, larg, alt);
     }
 
-    private void initShot(int x, int y) {
+    private void initShot(String loc, int x, int y, int larg, int alt) {
 
-        String shotImg = "images/shot.png";
-        ImageIcon ii = new ImageIcon(shotImg);
+        ScaleImage scaledImage = new ScaleImage(loc, larg, alt);
+        ImageIcon ii = scaledImage.getScaledImage();
         setImage(ii.getImage());
 
         int H_SPACE = 6;
@@ -44,21 +45,20 @@ public class Shot extends BadSprite {
         int y = getY();
 
         if(Objects.equals(direction, "left")){
-            x -= 4;
+            x -= 6;
         } else if(Objects.equals(direction, "right")){
-            x += 4;
+            x += 6;
         } else if(Objects.equals(direction, "down")){
-            y += 4;
+            y += 6;
         } else {
-            y -= 4;
+            y -= 6;
         }
 
         setY(y);
         setX(x);
 
-        // System.out.println("Tiro atualizado");
-
-        if (y < 0 || y > 350 || x < 0 || x > 358) {
+        /// colocar commons posteriormente na framework
+        if (y < 0 || y > 600 || x < 0 || x > 600) {
             die();
         }
     }

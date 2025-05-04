@@ -6,14 +6,16 @@ import spriteframework.AbstractBoard;
 import spriteframework.MainFrame;
 
 public class SpaceInvadersGame extends MainFrame {
+	private static final SpaceCommons config = new SpaceCommons();
 
 
 	public SpaceInvadersGame () {
-		super("Space Invaders");
+		super("Space Invaders", config);
 	}
 	
 	protected  AbstractBoard createBoard() {
-		return new SpaceInvadersBoard();
+		//SpaceCommons config = new SpaceCommons();
+		return new SpaceInvadersBoard(config);
 	}
 
 

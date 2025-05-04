@@ -1,19 +1,11 @@
 package spriteframework;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.swing.*;
 
 import spriteframework.sprite.BadSprite;
 import spriteframework.sprite.Player;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -24,18 +16,12 @@ public abstract class AbstractBoard extends JPanel {
 
     protected Dimension d;
     
-    //define sprites
-//    private List<Alien> aliens;
     protected LinkedList<Player> players;
     
     protected LinkedList<BadSprite> badSprites;
-    
-//    private Shot shot;
-//    
-    // define global control vars   
-//    private int direction = -1;
-//    private int deaths = 0;
+    protected Commons config;
 
+    protected Image backgroundImage;
     private int numberPlayers;  // to do - future use
     protected boolean inGame = true;
 //    private String explImg = "src/images/explosion.png";
@@ -47,23 +33,32 @@ public abstract class AbstractBoard extends JPanel {
     //  void initBoard()
     // 
     // HotSpots
-    protected abstract void createBadSprites();
+    protected abstract void createBadSprites(Commons config);
     protected abstract void createOtherSprites();
     protected abstract void drawOtherSprites(Graphics g);
     protected abstract void update();
     protected abstract void processOtherSprites(Player player, KeyEvent e);
     protected abstract void setPlayerMovementStrategy(Player player);
+    protected abstract Player createPlayer(Commons Config);
+    //protected abstract Dimension setDimensions();
 
-    public AbstractBoard() {
 
+    public AbstractBoard(Commons config) {
+        this.config = config;
         initBoard();
         createPlayers();
 		        numberPlayers = 1;
 		        badSprites = new LinkedList<BadSprite>();
-		        createBadSprites();
+		        createBadSprites(config);
 		        createOtherSprites();
+                setBackgroundImage();
 
 		//        shot = new Shot();
+    }
+
+    private void setBackgroundImage(){
+        backgroundImage = new ImageIcon(getClass().getResource(config.getBackgroungPath())).getImage();
+
     }
 
     private void initBoard() {
@@ -71,7 +66,7 @@ public abstract class AbstractBoard extends JPanel {
     	addKeyListener(new TAdapter());
     	setFocusable(true);
 
-    	d = new Dimension(Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
+    	d = new Dimension(config.getBoardWidth(),config.getBoardHeight());
     	setBackground(Color.black);
 
     	timer = new Timer(Commons.DELAY, new GameCycle());
@@ -80,24 +75,18 @@ public abstract class AbstractBoard extends JPanel {
     	createPlayers();
     	numberPlayers = 1;
     	badSprites = new LinkedList<BadSprite>();
-    	createBadSprites();
+    	createBadSprites(config);
     	createOtherSprites();
 
-
-		//        shot = new Shot();
     }
 
 
     protected void createPlayers() {
 		players = new LinkedList<Player>();
-        players.add(createPlayer());
+        players.add(createPlayer(config));
         for(Player player: players){
             setPlayerMovementStrategy(player);
         }
-	}
-	
-	protected Player createPlayer() {
-		return new Player();
 	}
 
    public Player getPlayer(int i) {
@@ -156,14 +145,21 @@ public abstract class AbstractBoard extends JPanel {
 
         g.setRenderingHint(RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_QUALITY);
-        g.setColor(Color.black);
-        g.fillRect(0, 0, d.width, d.height);
+        //g.setColor(Color.black);
+        //g.fillRect(0, 0, d.width, d.height);
+        if (backgroundImage == null ){
+            g.setColor(Color.black);
+            g.fillRect(0, 0, d.width, d.height);
+        } else {
+            g.drawImage(backgroundImage, 0, 0, d.width, d.height, this);
+        }
+
         g.setColor(Color.green);
 
         if (inGame) {
 
-            g.drawLine(0, Commons.GROUND,
-                    Commons.BOARD_WIDTH, Commons.GROUND);
+            g.drawLine(0, config.getGround(),
+                   config.getBoardWidth(), config.getGround() );
 
             drawBadSprites(g);
             drawPlayers(g);
@@ -183,21 +179,21 @@ public abstract class AbstractBoard extends JPanel {
 
     private void gameOver(Graphics g) {
 
-        g.setColor(Color.black);
-        g.fillRect(0, 0, Commons.BOARD_WIDTH, Commons.BOARD_HEIGHT);
+        g.setColor(new Color(0,0,0,100));
+        g.fillRect(0, 0, config.getBoardWidth(),config.getBoardHeight());
 
         g.setColor(new Color(0, 32, 48));
-        g.fillRect(50, Commons.BOARD_WIDTH / 2 - 30, Commons.BOARD_WIDTH - 100, 50);
+        g.fillRect(50, config.getBoardWidth() / 2 - 30, config.getBoardWidth() - 100, 50);
         g.setColor(Color.white);
-        g.drawRect(50, Commons.BOARD_WIDTH / 2 - 30, Commons.BOARD_WIDTH - 100, 50);
+        g.drawRect(50, config.getBoardWidth() / 2 - 30, config.getBoardWidth() - 100, 50);
 
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics fontMetrics = this.getFontMetrics(small);
 
         g.setColor(Color.white);
         g.setFont(small);
-        g.drawString(message, (Commons.BOARD_WIDTH - fontMetrics.stringWidth(message)) / 2,
-                Commons.BOARD_WIDTH / 2);
+        g.drawString(message, (config.getBoardWidth() - fontMetrics.stringWidth(message)) / 2,
+                config.getBoardWidth() / 2);
     }
 
 

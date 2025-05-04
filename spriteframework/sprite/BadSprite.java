@@ -9,4 +9,5 @@ public abstract class BadSprite extends Sprite {
 	public boolean isDestroyed() {
 		return false;
 	}
+	public void initMovimentation() {}
 }
