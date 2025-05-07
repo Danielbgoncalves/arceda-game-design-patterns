@@ -5,7 +5,7 @@
 - [@Danielbgoncalves](https://github.com/Danielbgoncalves)
 
 ---
-![Woody do filme Toy Story preso em uma gosma rosa](images/woodypreso.png)
+![Woody do filme Toy Story preso em uma gosma rosa](images/alien.png)
 
 ---
 
