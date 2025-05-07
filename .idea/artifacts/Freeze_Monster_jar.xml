@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Freeze-Monster:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Freeze_Monster_jar</output-path>
+    <root id="archive" name="Arcade-Sprite-Based-Space-Invaders.jar">
+      <element id="module-output" name="Arcade-Sprite-Based-Space-Invaders" />
+    </root>
+  </artifact>
+</component>
