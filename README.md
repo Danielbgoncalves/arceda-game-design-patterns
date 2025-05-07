@@ -5,9 +5,6 @@
 - [@Danielbgoncalves](https://github.com/Danielbgoncalves)
 
 ---
-![Woody do filme Toy Story preso em uma gosma rosa](images/alien.png)
-
----
 
 Este projeto é um framework genérico para jogos com sprites, estruturado para permitir fácil extensão e reutilização. 
 Ele já traz uma base pronta para movimentação, colisão e renderização de entidades em um tabuleiro/janela.
